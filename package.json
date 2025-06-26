@@ -1,0 +1,12 @@
+{
+  "name": "hackeros-tv",
+  "version": "1.0.0",
+  "description": "HackerOS TV Electron Application",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "dependencies": {
+    "electron": "^25.0.0"
+  }
+}
