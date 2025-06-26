@@ -1,0 +1,215 @@
+* {
+margin: 0;
+padding: 0;
+box-sizing: border-box;
+font-family: 'Courier New', Courier, monospace;
+}
+
+body {
+    background: linear-gradient(135deg, #1c2526 0%, #0d1117 100%);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #e0e0e0;
+    overflow: hidden;
+}
+
+.particles {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.hacker-menu {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    z-index: 10;
+}
+
+#hacker-menu-btn {
+background: linear-gradient(145deg, #2d2d2d, #3a3a3a);
+border: 2px solid #00ff88;
+color: #00ff88;
+padding: 12px 20px;
+border-radius: 8px;
+font-size: 16px;
+cursor: pointer;
+box-shadow: 0 0 10px #00ff88, 0 0 20px #00ff88, 0 0 30px #00ff88;
+transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+position: relative;
+overflow: hidden;
+}
+
+#hacker-menu-btn:hover {
+transform: scale(1.1);
+box-shadow: 0 0 15px #00ff88, 0 0 30px #00ff88, 0 0 45px #00ff88;
+border-color: #00ffcc;
+}
+
+#hacker-menu-btn:active {
+transform: scale(0.95);
+}
+
+#hacker-menu-btn::before {
+content: '';
+position: absolute;
+top: 0;
+left: -100%;
+width: 100%;
+height: 100%;
+background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(0, 255, 136, 0.2),
+                            transparent
+);
+transition: 0.5s;
+}
+
+#hacker-menu-btn:hover::before {
+left: 100%;
+}
+
+@keyframes glitch {
+    0% {
+        transform: translate(0);
+    }
+    20% {
+        transform: translate(-2px, 2px);
+    }
+    40% {
+        transform: translate(-2px, -2px);
+    }
+    60% {
+        transform: translate(2px, 2px);
+    }
+    80% {
+        transform: translate(2px, -2px);
+    }
+    100% {
+        transform: translate(0);
+    }
+}
+
+#hacker-menu-btn.glitch {
+animation: glitch 0.3s linear;
+}
+
+.main-container {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
+    z-index: 10;
+    animation: fadeIn 1.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(40px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.main-logo {
+    width: 320px;
+    height: auto;
+    opacity: 0.95;
+    filter: drop-shadow(0 0 25px rgba(255, 255, 255, 0.4));
+    animation: glowPulse 4s infinite ease-in-out;
+}
+
+@keyframes glowPulse {
+    0%, 100% { filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.3)); }
+    50% { filter: drop-shadow(0 0 30px rgba(255, 255, 255, 0.5)); }
+}
+
+.buttons-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    max-width: 900px;
+}
+
+.stream-button {
+    background: linear-gradient(145deg, #2d2d2d, #3a3a3a);
+    border: none;
+    color: #e0e0e0;
+    padding: 20px;
+    border-radius: 12px;
+    font-size: 18px;
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.6);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.stream-button:hover {
+    transform: scale(1.1);
+    box-shadow: 0 8px 20px rgba(255, 255, 255, 0.3);
+}
+
+.button-icon {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+}
+
+.footer {
+    position: absolute;
+    bottom: 15px;
+    text-align: center;
+    font-size: 15px;
+    color: #b0b0b0;
+    z-index: 10;
+    font-family: 'Arial', sans-serif;
+}
+
+@media (max-width: 600px) {
+    .main-logo {
+        width: 220px;
+    }
+
+    .buttons-container {
+        grid-template-columns: 1fr;
+        max-width: 90%;
+    }
+
+    .stream-button {
+        font-size: 16px;
+        padding: 15px;
+    }
+
+    .button-icon {
+        width: 20px;
+        height: 20px;
+    }
+
+    #hacker-menu-btn {
+    font-size: 14px;
+    padding: 10px 15px;
+    }
+
+    .footer {
+        font-size: 13px;
+    }
+}
+
+@media (min-width: 1200px) {
+    .buttons-container {
+        max-width: 900px;
+    }
+
+    .main-logo {
+        width: 350px;
+    }
+}
