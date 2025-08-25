@@ -1,0 +1,93 @@
+QWidget {
+    background-color: #1E1E1E; /* Dark gray/black */
+    color: #FFFFFF; /* White text */
+    font-family: Arial;
+}
+
+QPushButton#serviceButton {
+    background-color: #333333; /* Medium gray */
+    border: 2px solid #555555; /* Lighter gray border */
+    border-radius: 15px;
+    color: #FFFFFF;
+    padding: 20px;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+QPushButton#serviceButton:hover {
+    background-color: #444444; /* Slightly lighter on hover */
+    border: 2px solid #777777;
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.3); /* Glow effect */
+}
+
+QPushButton#serviceButton:pressed {
+    background-color: #222222; /* Darker on press */
+}
+
+QPushButton#menuButton {
+    background-color: #2A2A2A; /* Subtle gray */
+    border: 1px solid #444444;
+    border-radius: 10px;
+    color: #FFFFFF;
+    padding: 10px;
+    font-size: 18px;
+}
+
+QPushButton#menuButton:hover {
+    background-color: #3A3A3A;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+}
+
+QMenu#hackerMenu {
+    background-color: #1E1E1E;
+    border: 1px solid #333333;
+    color: #FFFFFF;
+    font-size: 16px;
+}
+
+QMenu#hackerMenu::item {
+    padding: 10px 20px;
+    background-color: transparent;
+}
+
+QMenu#hackerMenu::item:selected {
+    background-color: #333333;
+}
+
+QPushButton#settingsButton {
+    background-color: #282828;
+    border: 2px solid #505050;
+    border-radius: 12px;
+    color: #FFFFFF;
+    padding: 15px;
+    font-size: 20px;
+}
+
+QPushButton#settingsButton:hover {
+    background-color: #383838;
+    box-shadow: 0 0 12px rgba(255, 255, 255, 0.25);
+}
+
+QPushButton#backButton {
+    background-color: #252525;
+    border: 1px solid #404040;
+    border-radius: 8px;
+    color: #FFFFFF;
+    padding: 10px;
+    font-size: 18px;
+}
+
+QPushButton#backButton:hover {
+    background-color: #353535;
+}
+
+QLabel {
+    color: #FFFFFF;
+    font-size: 32px;
+    font-weight: bold;
+}
+
+/* Overall fullscreen feel with subtle gradients */
+QWidget::window {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #121212, stop:1 #1E1E1E);
+}
