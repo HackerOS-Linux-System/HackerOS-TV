@@ -1,43 +1,116 @@
-import sys
 import subprocess
-from PyQt6.QtWidgets import QApplication, QWidget, QPushButton, QLabel, QVBoxLayout, QHBoxLayout, QGridLayout, QMenu, QMenuBar
-from PyQt6.QtGui import QPixmap, QIcon, QFont, QKeySequence, QShortcut
-from PyQt6.QtCore import Qt, QCoreApplication
+import os
+from kivy.app import App
+from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.gridlayout import GridLayout
+from kivy.uix.button import Button
+from kivy.uix.label import Label
+from kivy.uix.image import Image
+from kivy.uix.dropdown import DropDown
+from kivy.core.window import Window
+from kivy.properties import StringProperty, NumericProperty
+from kivy.uix.screenmanager import ScreenManager, Screen
+from kivy.animation import Animation
+from kivy.metrics import dp
+from kivy.graphics import PushMatrix, PopMatrix, Scale
 
-class HackerOSTV(QWidget):
-    def __init__(self):
-        super().__init__()
-        self.setWindowTitle("HackerOS TV")
-        self.setStyleSheet(open("style.qss").read())
-        self.initUI()
-        self.showFullScreen()  # Fullscreen mode for Sway/Ubuntu
+# Set fullscreen mode
+Window.fullscreen = True
 
-    def initUI(self):
+class HackerMenuButton(Button):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.dropdown = DropDown()
+        actions = [
+            ("Wyłącz komputer", ["shutdown", "-h", "now"]),
+            ("Restart", ["reboot"]),
+            ("Log out", ["swaymsg", "exit"])
+        ]
+        for name, cmd in actions:
+            btn = Button(text=name, size_hint_y=None, height=dp(50))
+            btn.bind(on_release=lambda btn, c=cmd: self.execute_action(c))
+            self.dropdown.add_widget(btn)
+        self.bind(on_release=self.dropdown.open)
+
+    def execute_action(self, cmd):
+        try:
+            subprocess.call(cmd)
+        except FileNotFoundError:
+            print(f"Command {cmd} not found.")
+        self.dropdown.dismiss()
+
+class ServiceButton(Button):
+    url = StringProperty('')
+    scale_value = NumericProperty(1.0)  # Add scale_value property for animation
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        # Add Scale instruction to canvas
+        with self.canvas.before:
+            self.push_matrix = PushMatrix()
+            self.scale_instruction = Scale(1, 1, 1)
+        with self.canvas.after:
+            self.pop_matrix = PopMatrix()
+
+    def on_release(self):
+        # Animate the scale_instruction
+        anim = Animation(scale_value=0.95, duration=0.1) + Animation(scale_value=1.0, duration=0.1)
+        anim.bind(on_progress=lambda instance, widget, progress: self.update_scale())
+        anim.start(self)
+        App.get_running_app().root.current = 'main'
+        try:
+            subprocess.Popen(["vivaldi", "--start-fullscreen", self.url])
+        except FileNotFoundError:
+            print(f"Vivaldi browser not found for URL: {self.url}")
+
+    def update_scale(self):
+        # Update the Scale instruction with the current scale_value
+        self.scale_instruction.x = self.scale_value
+        self.scale_instruction.y = self.scale_value
+
+class SettingsButton(Button):
+    cmd = StringProperty('')
+    scale_value = NumericProperty(1.0)  # Add scale_value property for animation
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        # Add Scale instruction to canvas
+        with self.canvas.before:
+            self.push_matrix = PushMatrix()
+            self.scale_instruction = Scale(1, 1, 1)
+        with self.canvas.after:
+            self.pop_matrix = PopMatrix()
+
+    def on_release(self):
+        # Animate the scale_instruction
+        anim = Animation(scale_value=0.95, duration=0.1) + Animation(scale_value=1.0, duration=0.1)
+        anim.bind(on_progress=lambda instance, widget, progress: self.update_scale())
+        anim.start(self)
+        try:
+            subprocess.call(self.cmd.split())
+        except FileNotFoundError:
+            print(f"Command {self.cmd} not found.")
+
+    def update_scale(self):
+        # Update the Scale instruction with the current scale_value
+        self.scale_instruction.x = self.scale_value
+        self.scale_instruction.y = self.scale_value
+
+class MainScreen(Screen):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
         # Main layout
-        main_layout = QVBoxLayout()
-        main_layout.setContentsMargins(0, 0, 0, 0)
-        main_layout.setSpacing(0)
-
-        # Top bar for logo
-        top_bar = QHBoxLayout()
-        top_bar.setContentsMargins(20, 20, 20, 0)
-
-        # Logo in top-right
-        logo_label = QLabel(self)
-        pixmap = QPixmap("/usr/share/HackerOS/ICONS/HackerOS-TV.png")
-        logo_label.setPixmap(pixmap.scaled(100, 100, Qt.AspectRatioMode.KeepAspectRatio))
-        logo_label.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignTop)
-        top_bar.addStretch()
-        top_bar.addWidget(logo_label)
-
-        main_layout.addLayout(top_bar)
-
-        # Center buttons grid
-        center_layout = QGridLayout()
-        center_layout.setContentsMargins(0, 0, 0, 0)
-        center_layout.setSpacing(50)
-        center_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
-
+        main_layout = BoxLayout(orientation='vertical', padding=dp(20), spacing=dp(10))
+        # Top bar with logo
+        top_bar = BoxLayout(orientation='horizontal', size_hint_y=0.1)
+        top_bar.add_widget(Label())  # Spacer
+        logo_path = "/usr/share/HackerOS/ICONS/HackerOS-TV.png"
+        logo = Image(source=logo_path if os.path.exists(logo_path) else '',
+                     size_hint=(None, None), size=(dp(100), dp(100)))
+        top_bar.add_widget(logo)
+        main_layout.add_widget(top_bar)
+        # Center grid for service buttons
+        grid = GridLayout(cols=3, spacing=dp(50), padding=dp(20), size_hint_y=0.7)
         buttons = [
             ("Prime Video", "https://www.primevideo.com"),
             ("Disney+", "https://www.disneyplus.com"),
@@ -50,77 +123,57 @@ class HackerOSTV(QWidget):
             ("Apple TV", "https://tv.apple.com"),
             ("Twitch", "https://www.twitch.tv")
         ]
-
-        row, col = 0, 0
         for name, url in buttons:
-            btn = QPushButton(name, self)
-            btn.setObjectName("serviceButton")
-            btn.setFont(QFont("Arial", 24, QFont.Weight.Bold))
-            btn.setFixedSize(300, 150)
-            btn.clicked.connect(lambda checked, u=url: self.openService(u))
-            center_layout.addWidget(btn, row, col)
-            col += 1
-            if col > 2:  # 3 columns
-                col = 0
-                row += 1
+            btn = ServiceButton(text=name, url=url, size_hint=(None, None), size=(dp(300), dp(150)))
+            grid.add_widget(btn)
+        main_layout.add_widget(grid)
+        # Bottom bar with settings and menu
+        bottom_bar = BoxLayout(orientation='horizontal', size_hint_y=0.1)
+        settings_btn = Button(text="Ustawienia", size_hint=(None, None), size=(dp(200), dp(60)))
+        settings_btn.bind(on_release=lambda x: App.get_running_app().root.switch_to(SettingsScreen(name='settings')))
+        bottom_bar.add_widget(settings_btn)
+        bottom_bar.add_widget(Label())  # Spacer
+        menu_btn = HackerMenuButton(text="Hacker Menu", size_hint=(None, None), size=(dp(200), dp(60)))
+        bottom_bar.add_widget(menu_btn)
+        main_layout.add_widget(bottom_bar)
+        self.add_widget(main_layout)
 
-        main_layout.addStretch()
-        main_layout.addLayout(center_layout)
-        main_layout.addStretch()
+class SettingsScreen(Screen):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        main_layout = BoxLayout(orientation='vertical', padding=dp(50), spacing=dp(30))
+        # Title
+        title = Label(text="Ustawienia", size_hint_y=None, height=dp(80))
+        main_layout.add_widget(title)
+        # Settings options
+        options = [
+            ("Ustawienia Internetu", "nmcli device wifi list"),
+            ("Ustawienia Bluetooth", "bluetoothctl"),
+            ("Ustawienia Jasności (Zwiększ)", "brightnessctl set +10%"),
+            ("Ustawienia Jasności (Zmniejsz)", "brightnessctl set 10%-"),
+            ("Ustawienia Dźwięku (Głośniej)", "amixer sset Master 5%+"),
+            ("Ustawienia Dźwięku (Ciszej)", "amixer sset Master 5%-")
+        ]
+        for name, cmd in options:
+            btn = SettingsButton(text=name, cmd=cmd, size_hint_y=None, height=dp(80))
+            main_layout.add_widget(btn)
+        main_layout.add_widget(Label())  # Spacer
+        # Back button
+        back_btn = Button(text="Back", size_hint=(None, None), size=(dp(150), dp(50)))
+        back_btn.bind(on_release=lambda x: App.get_running_app().root.switch_to(MainScreen(name='main')))
+        back_layout = BoxLayout(orientation='horizontal')
+        back_layout.add_widget(Label())
+        back_layout.add_widget(back_btn)
+        back_layout.add_widget(Label())
+        main_layout.add_widget(back_layout)
+        self.add_widget(main_layout)
 
-        # Bottom right: Hacker Menu button
-        bottom_layout = QHBoxLayout()
-        bottom_layout.setContentsMargins(20, 0, 20, 20)
+class HackerOSTVApp(App):
+    def build(self):
+        sm = ScreenManager()
+        sm.add_widget(MainScreen(name='main'))
+        sm.add_widget(SettingsScreen(name='settings'))
+        return sm
 
-        # Settings button
-        settings_btn = QPushButton("Ustawienia", self)
-        settings_btn.setObjectName("menuButton")
-        settings_btn.setFont(QFont("Arial", 18))
-        settings_btn.setFixedSize(200, 60)
-        settings_btn.clicked.connect(self.openSettings)
-        bottom_layout.addWidget(settings_btn)
-
-        bottom_layout.addStretch()
-
-        # Hacker Menu
-        menu_btn = QPushButton("Hacker Menu", self)
-        menu_btn.setObjectName("menuButton")
-        menu_btn.setFont(QFont("Arial", 18))
-        menu_btn.setFixedSize(200, 60)
-        menu_btn.clicked.connect(self.showHackerMenu)
-        bottom_layout.addWidget(menu_btn)
-
-        main_layout.addLayout(bottom_layout)
-
-        self.setLayout(main_layout)
-
-    def openService(self, url):
-        self.close()
-        subprocess.Popen(["vivaldi", "--start-fullscreen", url])
-
-    def openSettings(self):
-        self.close()
-        subprocess.Popen(["python3", "settings.py"])
-
-    def showHackerMenu(self):
-        menu = QMenu(self)
-        menu.setObjectName("hackerMenu")
-        menu.setStyleSheet(self.styleSheet())  # Apply same stylesheet
-
-        shutdown_action = menu.addAction("Wyłącz komputer")
-        shutdown_action.triggered.connect(lambda: subprocess.call(["shutdown", "-h", "now"]))
-
-        reboot_action = menu.addAction("Restart")
-        reboot_action.triggered.connect(lambda: subprocess.call(["reboot"]))
-
-        logout_action = menu.addAction("Log out")
-        logout_action.triggered.connect(lambda: subprocess.call(["swaymsg", "exit"]))
-
-        # Position menu near the button
-        pos = self.mapToGlobal(self.sender().pos())
-        menu.exec(pos)
-
-if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    ex = HackerOSTV()
-    sys.exit(app.exec())
+if __name__ == '__main__':
+    HackerOSTVApp().run()
