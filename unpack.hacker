@@ -1,2 +1,6 @@
 // curl
+> cd /usr/lib/HackerOS/
 > curl -L -o HackerOS-TV "https://github.com/HackerOS-Linux-System/HackerOS-TV/releases/download/v0.1/HackerOS-TV"
+> sudo chmod a+x HackerOS-TV
+> cd ~/.hackeros/
+> sudo mkdir HackerOS-TV
