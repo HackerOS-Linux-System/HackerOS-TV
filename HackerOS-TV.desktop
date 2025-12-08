@@ -1,6 +1,6 @@
 [Desktop Entry]
 Name=HackerOS TV
 Comment=A special session inspired by the one from steamos but worth watching.
-Exec=/usr/lib/HackerOS/HackerOS-TV
+Exec=cage /usr/lib/HackerOS/HackerOS-TV
 Type=Application
 DesktopNames=HackerOS-Sessions
