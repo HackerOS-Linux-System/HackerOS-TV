@@ -1,1 +1,3 @@
-
+// curl
+> sudo rm -rf /usr/lib/HackerOS/HackerOS-TV
+> sudo rm -rf ~/.hackeros/HackerOS-TV/
