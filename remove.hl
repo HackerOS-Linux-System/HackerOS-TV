@@ -1,2 +1,3 @@
-> sudo rm -rf /usr/lib/HackerOS/HackerOS-TV
-> sudo rm -rf ~/.hackeros/HackerOS-TV/
+^> rm -rf /usr/bin/HackerOS-TV
+^> rm -rf /usr/share/applications/HackerOS-TV.desktop
+^> rm -rf /usr/share/wayland-sessions/HackerOS-TV.desktop
