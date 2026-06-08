@@ -1,0 +1,164 @@
+.card {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--r-lg);
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding: 16px;
+  gap: 4px;
+  cursor: pointer;
+  transition:
+    transform var(--t-mid),
+    border-color var(--t-mid),
+    box-shadow var(--t-mid);
+  animation: fadeIn 400ms both;
+  text-align: left;
+  flex-shrink: 0;
+}
+
+/* Sizes */
+.featured {
+  width: 200px;
+  height: 130px;
+}
+
+.normal {
+  width: 160px;
+  height: 110px;
+}
+
+.small {
+  width: 140px;
+  height: 96px;
+}
+
+/* Hover state */
+.card:hover {
+  transform: translateY(-4px) scale(1.02);
+  border-color: var(--card-color, var(--accent));
+  box-shadow:
+    0 8px 32px var(--card-glow, var(--accent-glow)),
+    0 0 0 1px var(--card-color, var(--accent));
+}
+
+.card:hover .glow {
+  opacity: 1;
+}
+
+.card:hover .playHint {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.card:hover .iconWrap {
+  transform: scale(1.1);
+}
+
+/* BG gradient */
+.bg {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    var(--card-color, #4f8eff) 0%,
+    transparent 60%
+  );
+  opacity: 0.08;
+  pointer-events: none;
+  transition: opacity var(--t-mid);
+}
+
+.card:hover .bg {
+  opacity: 0.15;
+}
+
+/* Glow orb */
+.glow {
+  position: absolute;
+  top: -30px;
+  right: -30px;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: var(--card-color, var(--accent));
+  filter: blur(40px);
+  opacity: 0;
+  transition: opacity var(--t-slow);
+  pointer-events: none;
+}
+
+/* Icon */
+.iconWrap {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  transition: transform var(--t-mid);
+}
+
+.icon {
+  font-size: 24px;
+  line-height: 1;
+  color: var(--card-color, var(--accent));
+  filter: drop-shadow(0 0 8px var(--card-color, var(--accent)));
+}
+
+/* Info */
+.info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  position: relative;
+  z-index: 1;
+}
+
+.name {
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: 0.2px;
+  line-height: 1.2;
+}
+
+.featured .name {
+  font-size: 15px;
+}
+
+.category {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--card-color, var(--text-muted));
+  opacity: 0.7;
+}
+
+/* Play hint */
+.playHint {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, calc(-50% + 8px));
+  font-size: 22px;
+  color: white;
+  opacity: 0;
+  text-shadow: 0 0 16px rgba(255,255,255,0.5);
+  transition: opacity var(--t-mid), transform var(--t-mid);
+  pointer-events: none;
+}
+
+/* Featured dot */
+.featuredDot {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--card-color, var(--accent));
+  box-shadow: 0 0 6px var(--card-color, var(--accent));
+}
