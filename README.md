@@ -1,4 +1,4 @@
-# StreamBox 🎬
+# HackerOS TV
 
 Desktopowa sesja streamingowa inspirowana Google TV / Android TV.  
 Zbudowana na **Tauri 2 + React + TypeScript + Rust**.
