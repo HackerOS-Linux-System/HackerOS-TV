@@ -1,0 +1,160 @@
+.view {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* ── Hero ── */
+.hero {
+  display: flex;
+  align-items: center;
+  gap: 40px;
+  padding: 28px 40px 20px;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--border);
+  position: relative;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: linear-gradient(180deg, var(--accent), transparent);
+}
+
+.heroText {
+  flex-shrink: 0;
+}
+
+.heroTitle {
+  font-family: var(--font-display);
+  font-size: 42px;
+  line-height: 0.9;
+  letter-spacing: 3px;
+  color: var(--text-primary);
+}
+
+.heroTitle em {
+  font-style: normal;
+  color: var(--accent);
+}
+
+.heroSub {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-top: 8px;
+}
+
+.heroSearch {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.cineTag {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--accent-dim);
+  border: 1px solid rgba(79,142,255,0.2);
+  border-radius: var(--r-sm);
+  padding: 5px 12px;
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* ── Content ── */
+.content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 20px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* ── Sections ── */
+.section {
+  padding: 0 0 20px;
+}
+
+.sectionTitle {
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  padding: 0 40px 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.titleAccent {
+  color: var(--accent);
+  font-size: 14px;
+}
+
+/* ── Horizontal rows ── */
+.row {
+  display: flex;
+  gap: 12px;
+  padding: 4px 40px 8px;
+  overflow-x: auto;
+  overflow-y: visible;
+  scrollbar-width: thin;
+
+  /* Prevent cards being clipped on hover */
+  padding-bottom: 16px;
+  margin-bottom: -8px;
+}
+
+.row::-webkit-scrollbar {
+  height: 3px;
+}
+
+/* ── No results ── */
+.noResults {
+  color: var(--text-muted);
+  font-size: 13px;
+  padding: 20px 0;
+  display: flex;
+  align-items: center;
+}
+
+/* ── Custom URL hint ── */
+.customUrlHint {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 40px;
+  font-size: 13px;
+  color: var(--text-muted);
+  flex-wrap: wrap;
+}
+
+.keyHint {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-strong);
+  border-radius: 4px;
+  padding: 3px 8px;
+}
