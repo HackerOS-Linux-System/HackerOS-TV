@@ -1,8 +1,5 @@
-use pyo3::prelude::*;
+#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-fn main() -> PyResult<()> {
-    let code = include_str!("./main.py");
-    Python::with_gil(|py| {
-        py.run_bound(code, None, None)
-    })
+fn main() {
+    streambox_lib::run();
 }
