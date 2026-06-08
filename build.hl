@@ -1,4 +1,6 @@
 // npm
+// cargo
+// rustc
 
-> cd source-code
-> 
+> npm install 
+> npm run tauri build
