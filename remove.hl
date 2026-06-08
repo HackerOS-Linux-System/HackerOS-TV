@@ -1,4 +1,5 @@
 ^> rm -rf /usr/bin/HackerOS-TV
+^> rm -rf /usr/bin/streambox
 ^> rm -rf /usr/share/applications/HackerOS-TV.desktop
 ^> rm -rf /usr/share/wayland-sessions/HackerOS-TV.desktop
 ^> apt remove -y cage
