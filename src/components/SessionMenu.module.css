@@ -1,0 +1,117 @@
+.wrap {
+  position: fixed;
+  bottom: 24px;
+  left: 24px;
+  z-index: 500;
+}
+
+/* ── Trigger ── */
+.trigger {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(15,15,28,0.92);
+  border: 1px solid var(--border-strong);
+  color: var(--text-secondary);
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  backdrop-filter: blur(12px);
+  transition: color var(--t-fast), border-color var(--t-fast), box-shadow var(--t-fast);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+}
+
+.trigger:hover,
+.triggerOpen {
+  color: var(--text-primary);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-dim), 0 4px 16px rgba(0,0,0,0.5);
+}
+
+/* ── Menu popup ── */
+.menu {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 0;
+  width: 300px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-lg);
+  padding: 8px;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04) inset;
+  animation: slideUp 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(16px);
+}
+
+.menuHeader {
+  font-family: var(--font-display);
+  font-size: 18px;
+  letter-spacing: 3px;
+  color: var(--text-secondary);
+  padding: 8px 12px 6px;
+}
+
+.divider {
+  height: 1px;
+  background: var(--border);
+  margin: 4px 4px;
+}
+
+/* ── Items ── */
+.item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: var(--r-sm);
+  font-size: 14px;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: background var(--t-fast), color var(--t-fast);
+  text-align: left;
+}
+
+.item:hover { background: var(--bg-card-hover); }
+
+.itemIcon {
+  width: 22px;
+  text-align: center;
+  font-size: 16px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.itemHint {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 2px 6px;
+}
+
+.itemHintSmall {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-muted);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 2px 6px;
+}
+
+.itemWarn { color: var(--orange); }
+.itemWarn .itemIcon { color: var(--orange); }
+.itemWarn:hover { background: rgba(255,119,51,0.1); }
+
+.itemDanger { color: var(--red); }
+.itemDanger .itemIcon { color: var(--red); }
+.itemDanger:hover { background: rgba(255,68,102,0.1); }
