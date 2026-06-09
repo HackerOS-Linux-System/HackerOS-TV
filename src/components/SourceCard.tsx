@@ -1,4 +1,4 @@
-import React from "react";
+import { FC, CSSProperties } from "react";
 import type { StreamSource } from "../types";
 import styles from "./SourceCard.module.css";
 
@@ -9,7 +9,7 @@ interface SourceCardProps {
   animDelay?: number;
 }
 
-export const SourceCard: React.FC<SourceCardProps> = ({
+export const SourceCard: FC<SourceCardProps> = ({
   source,
   onOpen,
   size = "normal",
@@ -22,7 +22,7 @@ export const SourceCard: React.FC<SourceCardProps> = ({
         "--card-color": source.color,
         "--card-glow": source.color + "44",
         animationDelay: `${animDelay}ms`,
-      } as React.CSSProperties}
+      } as CSSProperties}
       onClick={() => onOpen(source)}
       title={`Otwórz ${source.name}`}
     >
