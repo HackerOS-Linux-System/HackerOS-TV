@@ -1,18 +1,15 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState, FC } from "react";
+import type { ToastMsg as ToastMessage } from "../types";
 import styles from "./Toast.module.css";
 
-export interface ToastMessage {
-  id: string;
-  text: string;
-  type: "info" | "success" | "error";
-}
+// ToastMessage imported from types
 
 interface ToastProps {
   messages: ToastMessage[];
   onDismiss: (id: string) => void;
 }
 
-export const Toast: React.FC<ToastProps> = ({ messages, onDismiss }) => {
+export const Toast: FC<ToastProps> = ({ messages, onDismiss }) => {
   return (
     <div className={styles.container}>
       {messages.map((m) => (
@@ -22,7 +19,7 @@ export const Toast: React.FC<ToastProps> = ({ messages, onDismiss }) => {
   );
 };
 
-const ToastItem: React.FC<{ message: ToastMessage; onDismiss: (id: string) => void }> = ({
+const ToastItem: FC<{ message: ToastMessage; onDismiss: (id: string) => void }> = ({
   message,
   onDismiss,
 }) => {
