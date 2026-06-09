@@ -1,48 +1,35 @@
 export interface StreamSource {
-  id: string;
-  name: string;
-  url: string;
-  icon: string;          // emoji or icon name
-  color: string;         // accent color hex
+  id:       string;
+  name:     string;
+  url:      string;
+  icon:     string;
+  color:    string;
   category: SourceCategory;
-  featured?: boolean;
+  featured: boolean;
 }
 
 export type SourceCategory = "streaming" | "sports" | "social" | "custom";
 
-export interface RecentItem {
-  id: string;
-  sourceId: string;
-  sourceName: string;
-  url: string;
-  timestamp: number;
-  title?: string;
+export interface AppConfig {
+  sources:            StreamSource[];
+  default_window_w:   number;
+  default_window_h:   number;
+  remember_position:  boolean;
+  language:           string;
+  tls_accept_invalid: boolean;
+  user_agent:         string;
+  session_switch_tty: number;
 }
 
-export interface AppState {
-  activeSource: StreamSource | null;
-  cinemaMode: boolean;
-  searchQuery: string;
-  systemInfo: SystemInfo | null;
-  recentItems: RecentItem[];
-  customUrl: string;
-  view: "home" | "browse" | "settings";
-  cageAvailable: boolean;
-}
+export const CATEGORY_LABELS: Record<SourceCategory | string, string> = {
+  streaming: "Streaming",
+  sports:    "Sport",
+  social:    "Live & Social",
+  custom:    "Własne",
+};
 
-export interface SystemInfo {
-  wayland: boolean;
-  display: string;
-  os: string;
-  arch: string;
-}
-
-// ─── Tauri Command Wrappers ────────────────────────────────────────────────────
-
-export interface TauriCommands {
-  open_stream: (args: { url: string; label: string; cinema: boolean }) => Promise<void>;
-  close_stream: (args: { label: string }) => Promise<void>;
-  launch_cage_session: () => Promise<string>;
-  toggle_fullscreen: () => Promise<void>;
-  get_system_info: () => Promise<SystemInfo>;
+export interface ToastMsg {
+  id:   string;
+  text: string;
+  type: "info" | "success" | "error";
 }
