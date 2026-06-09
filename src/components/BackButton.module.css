@@ -1,0 +1,29 @@
+.btn {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  background: rgba(10,10,20,0.88);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-xl);
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+  transition: background var(--t-fast), border-color var(--t-fast), box-shadow var(--t-fast);
+}
+
+.btn:hover {
+  background: rgba(20,20,40,0.95);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-dim), 0 4px 16px rgba(0,0,0,0.5);
+}
+
+.arrow { font-size: 18px; color: var(--accent); line-height: 1; }
+.label { letter-spacing: 0.3px; }
