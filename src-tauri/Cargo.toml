@@ -2,7 +2,7 @@
 name = "streambox"
 version = "0.1.0"
 description = "StreamBox — Desktop Streaming Session"
-authors = ["you"]
+authors = ["HackerOS Team <hackeros068@gmail.com>"]
 edition = "2021"
 
 [lib]
