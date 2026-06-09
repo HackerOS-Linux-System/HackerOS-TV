@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import { useRef, useState, FC } from "react";
 import styles from "./SearchBar.module.css";
 
 interface SearchBarProps {
@@ -8,7 +8,7 @@ interface SearchBarProps {
   placeholder?: string;
 }
 
-export const SearchBar: React.FC<SearchBarProps> = ({
+export const SearchBar: FC<SearchBarProps> = ({
   value,
   onChange,
   onOpenUrl,
