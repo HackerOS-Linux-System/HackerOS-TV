@@ -1,184 +1,153 @@
 import { useState, useEffect, useCallback } from "react";
-import { Topbar } from "./components/Topbar";
-import { HomeView } from "./components/HomeView";
-import { BrowseView } from "./components/BrowseView";
+import { Topbar }       from "./components/Topbar";
+import { HomeView }     from "./components/HomeView";
+import { BrowseView }   from "./components/BrowseView";
 import { SettingsView } from "./components/SettingsView";
-import { CinemaOverlay } from "./components/CinemaOverlay";
-import { Toast, type ToastMessage } from "./components/Toast";
-import { tauriApi, isTauri, openStreamFallback } from "./tauriApi";
-import type { StreamSource, SystemInfo } from "./types";
+import { SessionMenu }  from "./components/SessionMenu";
+import { Toast }        from "./components/Toast";
+import { api, isTauri } from "./tauriApi";
+import type { StreamSource, AppConfig, ToastMsg } from "./types";
 import styles from "./App.module.css";
 
-let toastCounter = 0;
+// ─── Default config (używany przed załadowaniem z Rust) ────────────────────────
+const DEFAULT_CONFIG: AppConfig = {
+  sources: [], default_window_w: 1280, default_window_h: 720,
+  remember_position: true, language: "pl",
+  tls_accept_invalid: true,
+  user_agent: "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+  session_switch_tty: 2,
+};
+
+let toastId = 0;
 
 export default function App() {
-  // ── State ────────────────────────────────────────────────────────────────
-  const [view, setView] = useState<"home" | "browse" | "settings">("home");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [cinemaMode, setCinemaMode] = useState(false);
-  const [showCinemaOverlay, setShowCinemaOverlay] = useState(false);
-  const [sysInfo, setSysInfo] = useState<SystemInfo | null>(null);
-  const [cageAvailable, setCageAvailable] = useState(false);
-  const [toasts, setToasts] = useState<ToastMessage[]>([]);
+  const [config,      setConfig]      = useState<AppConfig>(DEFAULT_CONFIG);
+  const [sessionMode, setSessionMode] = useState(false);
+  const [view,        setView]        = useState<"home" | "browse" | "settings">("home");
+  const [search,      setSearch]      = useState("");
+  const [toasts,      setToasts]      = useState<ToastMsg[]>([]);
+  const [loaded,      setLoaded]      = useState(false);
 
-  // ── Toast helpers ─────────────────────────────────────────────────────────
-  const addToast = useCallback((text: string, type: ToastMessage["type"] = "info") => {
-    const id = `t${++toastCounter}`;
-    setToasts((prev) => [...prev, { id, text, type }]);
+  // ── Toast helpers ────────────────────────────────────────────────────────
+  const addToast = useCallback((text: string, type: ToastMsg["type"] = "info") => {
+    const id = `t${++toastId}`;
+    setToasts((p) => [...p, { id, text, type }]);
   }, []);
-
   const dismissToast = useCallback((id: string) => {
-    setToasts((prev) => prev.filter((t) => t.id !== id));
+    setToasts((p) => p.filter((t) => t.id !== id));
   }, []);
 
-  // ── System info ────────────────────────────────────────────────────────────
-  const fetchSysInfo = useCallback(async () => {
-    if (!isTauri()) return;
-    try {
-      const info = await tauriApi.getSystemInfo();
-      setSysInfo(info);
-      // Check cage availability (heuristic: wayland available)
-      setCageAvailable(info.wayland);
-    } catch {
-      console.warn("Cannot fetch system info");
-    }
-  }, []);
-
+  // ── Load config + session mode from Rust ─────────────────────────────────
   useEffect(() => {
-    fetchSysInfo();
-  }, [fetchSysInfo]);
+    if (!isTauri()) { setLoaded(true); return; }
+    Promise.all([api.getConfig(), api.isSessionMode()])
+      .then(([cfg, session]) => {
+        setConfig(cfg);
+        setSessionMode(session);
+        setLoaded(true);
+      })
+      .catch(() => setLoaded(true));
+  }, []);
 
-  // ── Keyboard shortcuts ────────────────────────────────────────────────────
+  // ── Keyboard shortcuts ───────────────────────────────────────────────────
+  const goBackToMain = useCallback(() => {
+    if (!isTauri()) return;
+    api.goBackToMain().catch(() => {});
+  }, []);
+
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
+      // F — fullscreen (normalny tryb)
       if (e.key === "f" || e.key === "F") {
-        handleToggleFullscreen();
+        if (!e.ctrlKey && !e.metaKey && !e.shiftKey) {
+          if (isTauri()) api.toggleFullscreen();
+        }
       }
+      // Ctrl+Shift+B — back to main (session)
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === "b" || e.key === "B")) {
+        e.preventDefault();
+        if (sessionMode) goBackToMain();
+      }
+      // Ctrl+Shift+M — session menu (obsługiwane przez SessionMenu)
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
+  }, [sessionMode, goBackToMain]);
+
+  // ── Open stream ──────────────────────────────────────────────────────────
+  const handleOpenSource = useCallback(async (src: StreamSource) => {
+    if (isTauri()) {
+      try { await api.openStream(src.url, src.id); }
+      catch (e) { addToast(`Błąd: ${e}`, "error"); }
+    } else {
+      window.open(src.url, "_blank", "noopener");
+    }
+  }, [addToast]);
+
+  const handleOpenUrl = useCallback(async (url: string) => {
+    const label = `custom_${Date.now()}`;
+    if (isTauri()) {
+      try { await api.openStream(url, label); }
+      catch (e) { addToast(`Błąd: ${e}`, "error"); }
+    } else {
+      window.open(url, "_blank", "noopener");
+    }
+  }, [addToast]);
+
+  // ── Save config ──────────────────────────────────────────────────────────
+  const handleSaveConfig = useCallback(async (cfg: AppConfig) => {
+    if (isTauri()) await api.saveConfig(cfg);
+    setConfig(cfg);
   }, []);
 
-  // ── Open platform ─────────────────────────────────────────────────────────
-  const handleOpenSource = useCallback(
-    async (source: StreamSource) => {
-      if (isTauri()) {
-        try {
-          await tauriApi.openStream(source.url, source.id, cinemaMode);
-          addToast(`Otwarto ${source.name}`, "success");
-        } catch (err) {
-          addToast(`Błąd: ${err}`, "error");
-        }
-      } else {
-        openStreamFallback(source.url);
-        addToast(`Otwarto ${source.name} (tryb przeglądarki)`, "info");
-      }
-    },
-    [cinemaMode, addToast]
-  );
+  if (!loaded) {
+    return (
+      <div className={styles.loading}>
+        <span className={styles.loadingIcon}>◈</span>
+      </div>
+    );
+  }
 
-  // ── Open URL ──────────────────────────────────────────────────────────────
-  const handleOpenUrl = useCallback(
-    async (url: string) => {
-      const label = `custom_${Date.now()}`;
-      if (isTauri()) {
-        try {
-          await tauriApi.openStream(url, label, cinemaMode);
-          addToast("Otworzono URL", "success");
-        } catch (err) {
-          addToast(`Błąd: ${err}`, "error");
-        }
-      } else {
-        openStreamFallback(url);
-      }
-    },
-    [cinemaMode, addToast]
-  );
-
-  // ── Cinema mode ────────────────────────────────────────────────────────────
-  const handleToggleCinema = () => {
-    if (!cinemaMode) {
-      setShowCinemaOverlay(true);
-    } else {
-      setCinemaMode(false);
-      addToast("Tryb kino wyłączony", "info");
-    }
-  };
-
-  const handleToggleFullscreen = async () => {
-    if (isTauri()) {
-      await tauriApi.toggleFullscreen();
-    }
-  };
-
-  const handleLaunchCage = async () => {
-    setShowCinemaOverlay(false);
-    setCinemaMode(true);
-    if (isTauri()) {
-      try {
-        const result = await tauriApi.launchCageSession();
-        addToast(result, "success");
-      } catch (err) {
-        addToast(`Cage: ${err}`, "error");
-        setCinemaMode(false);
-      }
-    } else {
-      addToast("Cage dostępny tylko w Tauri", "error");
-      setCinemaMode(false);
-    }
-  };
-
-  const handleCinemaOverlayDismiss = () => {
-    setShowCinemaOverlay(false);
-  };
-
-  // ── Render ─────────────────────────────────────────────────────────────────
   return (
-    <div className={`${styles.app} ${cinemaMode ? styles.cinemaActive : ""}`}>
-      {/* Background noise/grain effect */}
+    <div className={styles.app}>
       <div className={styles.grain} aria-hidden />
 
-      {/* Top navigation bar */}
-      <Topbar
-        cinemaMode={cinemaMode}
-        onToggleCinema={handleToggleCinema}
-        onToggleFullscreen={handleToggleFullscreen}
-        view={view}
-        onViewChange={setView}
-      />
+      {/* W session mode nie pokazujemy topbara */}
+      {!sessionMode && (
+        <Topbar
+          view={view}
+          onViewChange={setView}
+          onToggleFullscreen={() => isTauri() && api.toggleFullscreen()}
+        />
+      )}
 
-      {/* Main content area */}
       <main className={styles.main}>
         {view === "home" && (
           <HomeView
-            searchQuery={searchQuery}
-            onSearchChange={setSearchQuery}
+            config={config}
+            searchQuery={search}
+            onSearchChange={setSearch}
             onOpenSource={handleOpenSource}
             onOpenUrl={handleOpenUrl}
-            cinemaMode={cinemaMode}
           />
         )}
         {view === "browse" && (
-          <BrowseView onOpenSource={handleOpenSource} />
+          <BrowseView config={config} onOpenSource={handleOpenSource} />
         )}
         {view === "settings" && (
           <SettingsView
-            sysInfo={sysInfo}
-            onRefreshSysInfo={fetchSysInfo}
+            config={config}
+            onConfigSave={handleSaveConfig}
+            addToast={addToast}
           />
         )}
       </main>
 
-      {/* Cinema mode overlay */}
-      {showCinemaOverlay && (
-        <CinemaOverlay
-          onDismiss={handleCinemaOverlayDismiss}
-          onLaunchCage={handleLaunchCage}
-          cageAvailable={cageAvailable}
-        />
+      {/* Session mode: menu w lewym dolnym rogu */}
+      {sessionMode && (
+        <SessionMenu onGoHome={goBackToMain} />
       )}
 
-      {/* Toasts */}
       <Toast messages={toasts} onDismiss={dismissToast} />
     </div>
   );
